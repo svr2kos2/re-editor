@@ -281,8 +281,14 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
     if (_isMobile) {
       return;
     }
-    _dragPosition = details.globalPosition;
-    _extendSelection(details.globalPosition, _SelectionChangedCause.drag);
+    var globalPosition = details.globalPosition;
+    if (kIsWeb && (details.primaryDelta ?? 100) < 100) {
+      final windosSize = MediaQuery.of(context).size;
+      final height = (windosSize.height - 135) / 2;
+      globalPosition = Offset(globalPosition.dx, globalPosition.dy + height);
+    }
+    _dragPosition = globalPosition;
+    _extendSelection(globalPosition, _SelectionChangedCause.drag);
   }
 
   void _onLongPressMove(LongPressMoveUpdateDetails details) {
