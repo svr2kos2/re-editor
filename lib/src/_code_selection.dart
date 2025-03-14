@@ -102,6 +102,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
           if (!_tapping) {
             return;
           }
+          _hugeYOffset = -(MediaQuery.of(context).size.height - 135) / 2;
           _dragPosition = details.globalPosition;
           _dragging = true;
           _autoScrollWhenDragging();
@@ -118,6 +119,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
           if (!_tapping) {
             return;
           }
+          _hugeYOffset = -(MediaQuery.of(context).size.height - 135) / 2;
           _dragPosition = details.globalPosition;
           _dragging = true;
           _autoScrollWhenDragging();
@@ -270,6 +272,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
     _anchorSelection = selection;
   }
 
+  double _hugeYOffset = 0;
   void _onDrag(DragUpdateDetails details) {
     if (!_tapping) {
       // https://github.com/flutter/flutter/issues/114889
@@ -282,10 +285,11 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       return;
     }
     var globalPosition = details.globalPosition;
-    if (kIsWeb && (details.primaryDelta ?? 100) < 100) {
-      final windosSize = MediaQuery.of(context).size;
-      final height = (windosSize.height - 135) / 2;
-      globalPosition = Offset(globalPosition.dx, globalPosition.dy + height);
+    if (kIsWeb) {
+      if (details.delta.dy > 64 || details.delta.dy < -64) {
+        _hugeYOffset = details.delta.dy > 0 ? 0 : details.delta.dy;
+      }
+      globalPosition = Offset(globalPosition.dx, globalPosition.dy - _hugeYOffset);
     }
     _dragPosition = globalPosition;
     _extendSelection(globalPosition, _SelectionChangedCause.drag);
