@@ -285,7 +285,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       return;
     }
     var globalPosition = details.globalPosition;
-    if (kIsWeb) {
+    if (kIsWeb && !widget.inputController._readOnly) {
       if (details.delta.dy > 64 || details.delta.dy < -64) {
         _hugeYOffset = details.delta.dy > 0 ? 0 : details.delta.dy;
       }
