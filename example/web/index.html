@@ -18,41 +18,47 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Configuration tool for Sayo devices.">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="example">
+  <meta name="apple-mobile-web-app-title" content="re-editor">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>example</title>
+  <title>sayo_driver</title>
   <link rel="manifest" href="manifest.json">
-
   <script>
-    // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = null;
+    // JavaScript to disable right-click context menu
+    document.addEventListener('contextmenu', function(event) {
+      event.preventDefault();
+    });
   </script>
-  <!-- This script adds the flutter initialization JS code -->
-  <script src="flutter.js" defer></script>
 </head>
 <body>
+  <!-- <script src="flutter_bootstrap.js" async></script> -->
   <script>
-    window.addEventListener('load', function(ev) {
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
+    {{flutter_js}}
+    {{flutter_build_config}}
+    _flutter.buildConfig['builds'][0]['mainJsPath'] += '?v=' + {{flutter_service_worker_version}};
+
+    const loading = document.createElement('div');
+    document.body.appendChild(loading);
+    loading.textContent = "Loading Entrypoint...";
+    _flutter.loader.load({
+      onEntrypointLoaded: async function(engineInitializer) {
+        loading.textContent = "Initializing engine...";
+        const appRunner = await engineInitializer.initializeEngine();
+    
+        loading.textContent = "Running app...";
+        await appRunner.runApp();
+      },
+      config: {
+        canvasKitBaseUrl:  document.querySelector('base').getAttribute('href') + "canvaskit/",
+      },
     });
   </script>
 </body>
